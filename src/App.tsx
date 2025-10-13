@@ -10,6 +10,9 @@ import MultifactorForecast from "./pages/MultifactorForecast";
 import InventoryOptimization from "./pages/InventoryOptimization";
 import ProcurementRecommendation from "./pages/ProcurementRecommendation";
 import ScenarioPlanning from "./pages/ScenarioPlanning";
+import CostOptimization from "./pages/CostOptimization";
+import AnomalyDetection from "./pages/AnomalyDetection";
+import RiskAnalysis from "./pages/RiskAnalysis";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +31,9 @@ const App = () => (
             <Route path="/inventory-optimization" element={<InventoryOptimization />} />
             <Route path="/procurement" element={<ProcurementRecommendation />} />
             <Route path="/scenario-planning" element={<ScenarioPlanning />} />
+            <Route path="/cost-optimization" element={<CostOptimization />} />
+            <Route path="/anomaly-detection" element={<AnomalyDetection />} />
+            <Route path="/risk-analysis" element={<RiskAnalysis />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
