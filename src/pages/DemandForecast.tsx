@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TrendingUp, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const DemandForecast = () => {
   const [loading, setLoading] = useState(false);
@@ -27,16 +28,11 @@ const DemandForecast = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("https://material-forecast.onrender.com/forecast", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
+        body: { service: 'demand_forecast', payload: formData }
       });
-
-      if (!response.ok) throw new Error("Forecast failed");
-
-      const data = await response.json();
-      setResult(data);
+      if (fnError) throw fnError;
+      setResult(fnData);
       
       toast({
         title: "Forecast Generated",

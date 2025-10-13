@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { DollarSign, TrendingDown, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const CostOptimization = () => {
   const { toast } = useToast();
@@ -25,23 +26,21 @@ const CostOptimization = () => {
     setLoading(true);
     
     try {
-      const response = await fetch("https://cost-optimization.onrender.com/optimize-cost", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          budget: parseFloat(formData.budget),
-          tax_rate: parseFloat(formData.tax_rate),
-          time_horizon_months: parseInt(formData.time_horizon_months),
-          materials: formData.materials.map(m => ({
-            name: m.name,
-            current_price_per_unit: parseFloat(m.current_price_per_unit),
-            forecasted_demand_units: parseInt(m.forecasted_demand_units)
-          }))
-        })
+      const payload = {
+        budget: parseFloat(formData.budget),
+        tax_rate: parseFloat(formData.tax_rate),
+        time_horizon_months: parseInt(formData.time_horizon_months),
+        materials: formData.materials.map(m => ({
+          name: m.name,
+          current_price_per_unit: parseFloat(m.current_price_per_unit),
+          forecasted_demand_units: parseInt(m.forecasted_demand_units)
+        }))
+      };
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
+        body: { service: 'cost_optimization', payload }
       });
-
-      const data = await response.json();
-      setResult(data);
+      if (fnError) throw fnError;
+      setResult(fnData);
       toast({ title: "Cost optimization analysis complete" });
     } catch (error) {
       toast({ title: "Error", description: "Failed to fetch cost optimization data", variant: "destructive" });

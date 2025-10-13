@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Package, Loader2, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Material {
   name: string;
@@ -64,19 +65,11 @@ const InventoryOptimization = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("https://inventory-optimization-s9dq.onrender.com/optimize_inventory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          materials,
-          simulation_scenario: scenario,
-        }),
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
+        body: { service: 'inventory_optimization', payload: { materials, simulation_scenario: scenario } }
       });
-
-      if (!response.ok) throw new Error("Optimization failed");
-
-      const data = await response.json();
-      setResult(data);
+      if (fnError) throw fnError;
+      setResult(fnData);
       
       toast({
         title: "Optimization Complete",

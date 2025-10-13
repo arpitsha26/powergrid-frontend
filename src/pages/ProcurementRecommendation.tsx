@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShoppingCart, Loader2, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProcurementRecommendation = () => {
   const [loading, setLoading] = useState(false);
@@ -23,16 +24,11 @@ const ProcurementRecommendation = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("https://procurement-recommendation.onrender.com/recommend-procurement", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
+        body: { service: 'procurement_recommendation', payload: formData }
       });
-
-      if (!response.ok) throw new Error("Recommendation failed");
-
-      const data = await response.json();
-      setResult(data);
+      if (fnError) throw fnError;
+      setResult(fnData);
       
       toast({
         title: "Recommendations Generated",

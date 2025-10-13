@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BarChart3, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ScenarioPlanning = () => {
   const [loading, setLoading] = useState(false);
@@ -27,16 +28,11 @@ const ScenarioPlanning = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("https://scenario-planning.onrender.com/forecast", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
+        body: { service: 'scenario_planning', payload: formData }
       });
-
-      if (!response.ok) throw new Error("Scenario planning failed");
-
-      const data = await response.json();
-      setResult(data);
+      if (fnError) throw fnError;
+      setResult(fnData);
       
       toast({
         title: "Scenario Analysis Complete",

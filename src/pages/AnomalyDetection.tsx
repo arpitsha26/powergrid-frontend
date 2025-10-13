@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { AlertTriangle, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const AnomalyDetection = () => {
   const { toast } = useToast();
@@ -26,20 +27,15 @@ const AnomalyDetection = () => {
     setLoading(true);
     
     try {
-      const response = await fetch("https://anomaly-detection-55ys.onrender.com/detect-anomalies", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          material: formData.material,
-          data: formData.data.map(d => ({
-            date: d.date,
-            quantity: parseFloat(d.quantity)
-          }))
-        })
+      const payload = {
+        material: formData.material,
+        data: formData.data.map(d => ({ date: d.date, quantity: parseFloat(d.quantity) }))
+      };
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
+        body: { service: 'anomaly_detection', payload }
       });
-
-      const data = await response.json();
-      setResult(data);
+      if (fnError) throw fnError;
+      setResult(fnData);
       toast({ title: "Anomaly detection complete" });
     } catch (error) {
       toast({ title: "Error", description: "Failed to detect anomalies", variant: "destructive" });

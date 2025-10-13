@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react";
 import { Target, AlertCircle, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const RiskAnalysis = () => {
   const { toast } = useToast();
@@ -27,23 +28,21 @@ const RiskAnalysis = () => {
     setLoading(true);
     
     try {
-      const response = await fetch("https://risk-analysis-rq2k.onrender.com/analyze-risk", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          project_name: formData.project_name,
-          location: formData.location,
-          budget: parseFloat(formData.budget),
-          supplier_reliability: parseFloat(formData.supplier_reliability),
-          material_type: formData.material_type,
-          expected_delivery_days: parseInt(formData.expected_delivery_days),
-          project_deadline_days: parseInt(formData.project_deadline_days),
-          external_factors: formData.external_factors
-        })
+      const payload = {
+        project_name: formData.project_name,
+        location: formData.location,
+        budget: parseFloat(formData.budget),
+        supplier_reliability: parseFloat(formData.supplier_reliability),
+        material_type: formData.material_type,
+        expected_delivery_days: parseInt(formData.expected_delivery_days),
+        project_deadline_days: parseInt(formData.project_deadline_days),
+        external_factors: formData.external_factors
+      };
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
+        body: { service: 'risk_analysis', payload }
       });
-
-      const data = await response.json();
-      setResult(data);
+      if (fnError) throw fnError;
+      setResult(fnData);
       toast({ title: "Risk analysis complete" });
     } catch (error) {
       toast({ title: "Error", description: "Failed to analyze risk", variant: "destructive" });
