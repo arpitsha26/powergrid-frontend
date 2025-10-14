@@ -163,7 +163,11 @@ const DemandForecast = () => {
           <Card>
             <CardHeader>
               <CardTitle>Forecast Results</CardTitle>
-              <CardDescription>{result.insight}</CardDescription>
+              <CardDescription>
+                {typeof result.insight === "string"
+                  ? result.insight
+                  : JSON.stringify(result.insight, null, 2)}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
@@ -171,22 +175,36 @@ const DemandForecast = () => {
                   <div key={index} className="p-4 bg-muted rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <span className="text-sm font-medium text-muted-foreground">
-                        {new Date(forecast.ds).toLocaleDateString()}
+                        {forecast.ds instanceof Date
+                          ? forecast.ds.toLocaleDateString()
+                          : typeof forecast.ds === "string"
+                          ? new Date(forecast.ds).toLocaleDateString()
+                          : JSON.stringify(forecast.ds)}
                       </span>
                       <span className={`text-lg font-bold ${forecast.yhat_adjusted >= 0 ? 'text-success' : 'text-destructive'}`}>
-                        {forecast.yhat_adjusted.toFixed(2)} tons
+                        {typeof forecast.yhat_adjusted === "number"
+                          ? forecast.yhat_adjusted.toFixed(2)
+                          : JSON.stringify(forecast.yhat_adjusted)} tons
                       </span>
                     </div>
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Lower: {forecast.yhat_lower.toFixed(2)}</span>
-                      <span>Upper: {forecast.yhat_upper.toFixed(2)}</span>
+                      <span>
+                        Lower: {typeof forecast.yhat_lower === "number"
+                          ? forecast.yhat_lower.toFixed(2)
+                          : JSON.stringify(forecast.yhat_lower)}
+                      </span>
+                      <span>
+                        Upper: {typeof forecast.yhat_upper === "number"
+                          ? forecast.yhat_upper.toFixed(2)
+                          : JSON.stringify(forecast.yhat_upper)}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
               <div className="pt-4 border-t border-border">
                 <p className="text-sm text-muted-foreground">
-                  Source: {result.source}
+                  Source: {typeof result.source === "string" ? result.source : JSON.stringify(result.source)}
                 </p>
               </div>
             </CardContent>

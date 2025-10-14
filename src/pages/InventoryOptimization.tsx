@@ -235,49 +235,68 @@ const InventoryOptimization = () => {
         </CardContent>
       </Card>
 
-      {result && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Optimization Results</CardTitle>
-            <CardDescription>Scenario: {result.scenario}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {result.optimized_inventory?.map((item: any, index: number) => (
-              <div key={index} className="p-4 bg-muted rounded-lg space-y-3">
-                <h3 className="font-semibold text-lg">{item.name}</h3>
-                
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Reorder Point</p>
-                    <p className="text-xl font-bold text-primary">{item.recommended_reorder_point}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Optimal Stock</p>
-                    <p className="text-xl font-bold text-secondary">{item.optimal_stock_level}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground">Safety Stock</p>
-                    <p className="text-xl font-bold text-success">{item.safety_stock}</p>
-                  </div>
-                </div>
+    {result && (
+  <Card>
+    <CardHeader>
+      <CardTitle>Optimization Results</CardTitle>
+      <CardDescription>
+        {typeof result.scenario === "string" ? result.scenario : JSON.stringify(result.scenario)}
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="space-y-4">
+      {result.optimized_inventory?.map((item: any, index: number) => (
+        <div key={index} className="p-4 bg-muted rounded-lg space-y-3">
+          <h3 className="font-semibold text-lg">
+            {typeof item.name === "string" ? item.name : JSON.stringify(item.name)}
+          </h3>
 
-                <p className="text-sm text-muted-foreground border-t border-border pt-3">
-                  {item.comment}
-                </p>
-                
-                {item.price_trend_info && (
-                  <div className="bg-background p-3 rounded text-xs">
-                    <p className="font-medium mb-1">Market Insight:</p>
-                    <p className="text-muted-foreground">{item.price_trend_info}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-};
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs text-muted-foreground">Reorder Point</p>
+              <p className="text-xl font-bold text-primary">
+                {typeof item.recommended_reorder_point === "number"
+                  ? item.recommended_reorder_point
+                  : JSON.stringify(item.recommended_reorder_point)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Optimal Stock</p>
+              <p className="text-xl font-bold text-secondary">
+                {typeof item.optimal_stock_level === "number"
+                  ? item.optimal_stock_level
+                  : JSON.stringify(item.optimal_stock_level)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Safety Stock</p>
+              <p className="text-xl font-bold text-success">
+                {typeof item.safety_stock === "number"
+                  ? item.safety_stock
+                  : JSON.stringify(item.safety_stock)}
+              </p>
+            </div>
+          </div>
 
+          <p className="text-sm text-muted-foreground border-t border-border pt-3">
+            {typeof item.comment === "string" ? item.comment : JSON.stringify(item.comment)}
+          </p>
+
+          {item.price_trend_info && (
+            <div className="bg-background p-3 rounded text-xs">
+              <p className="font-medium mb-1">Market Insight:</p>
+              <p className="text-muted-foreground">
+                {typeof item.price_trend_info === "string"
+                  ? item.price_trend_info
+                  : JSON.stringify(item.price_trend_info)}
+              </p>
+            </div>
+          )}
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+)}
+</div>
+)
+}
 export default InventoryOptimization;

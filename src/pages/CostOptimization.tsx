@@ -24,7 +24,7 @@ const CostOptimization = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const payload = {
         budget: parseFloat(formData.budget),
@@ -36,6 +36,7 @@ const CostOptimization = () => {
           forecasted_demand_units: parseInt(m.forecasted_demand_units)
         }))
       };
+
       const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
         body: { service: 'cost_optimization', payload }
       });
@@ -47,6 +48,23 @@ const CostOptimization = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Safe number formatting
+  const formatNumber = (value: any, decimals = 2) => {
+    const num = Number(value);
+    return isNaN(num) ? "N/A" : num.toFixed(decimals);
+  };
+
+  // Render an object safely
+  const renderObject = (obj: any) => {
+    if (!obj || typeof obj !== "object") return obj ?? "N/A";
+    return Object.entries(obj).map(([key, value]: [string, any]) => (
+      <div key={key} className="mb-2">
+        <strong className="capitalize">{key}:</strong>{" "}
+        {typeof value === "object" ? renderObject(value) : value ?? "N/A"}
+      </div>
+    ));
   };
 
   return (
@@ -106,41 +124,27 @@ const CostOptimization = () => {
 
       {result && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Trend Analysis */}
           <Card>
             <CardHeader>
               <CardTitle>Trend Analysis</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {Object.entries(result.trend_analysis || {}).map(([material, data]: [string, any]) => (
-                <div key={material} className="p-4 bg-muted rounded-lg">
-                  <h3 className="font-semibold capitalize mb-2">{material}</h3>
-                  <div className="space-y-1 text-sm">
-                    <p>Forecasted Price: ₹{data.forecasted_price_per_unit?.toFixed(2)}</p>
-                    <p className="flex items-center gap-2">
-                      <TrendingDown className="h-4 w-4" />
-                      Trend: {data.trend_direction}
-                    </p>
-                    <p className="text-muted-foreground">{data.trend_comment}</p>
-                  </div>
-                </div>
-              ))}
+              {result.trend_analysis && renderObject(result.trend_analysis)}
             </CardContent>
           </Card>
 
+          {/* Procurement Strategy */}
           <Card>
             <CardHeader>
               <CardTitle>Procurement Strategy</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {Object.entries(result.strategy || {}).map(([material, strategy]) => (
-                <div key={material} className="p-4 bg-muted rounded-lg">
-                  <h3 className="font-semibold capitalize mb-2">{material}</h3>
-                  <p className="text-sm">{strategy as string}</p>
-                </div>
-              ))}
+              {result.strategy && renderObject(result.strategy)}
             </CardContent>
           </Card>
 
+          {/* Summary & Recommendations */}
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -149,20 +153,7 @@ const CostOptimization = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Savings Potential</p>
-                  <p className="text-2xl font-bold">₹{result.summary?.savings_potential?.toFixed(2)}</p>
-                </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Risk Level</p>
-                  <p className="text-2xl font-bold capitalize">{result.summary?.risk_level}</p>
-                </div>
-                <div className="p-4 bg-muted rounded-lg md:col-span-1">
-                  <p className="text-sm text-muted-foreground mb-1">Recommendation</p>
-                  <p className="text-sm">{result.summary?.recommendation}</p>
-                </div>
-              </div>
+              {result.summary && renderObject(result.summary)}
             </CardContent>
           </Card>
         </div>

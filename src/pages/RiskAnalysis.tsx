@@ -1,12 +1,22 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
 import { Target, AlertCircle, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+
+// --- Safe render helper ---
+function renderSafe(value: any): React.ReactNode {
+  if (typeof value === "string" || typeof value === "number") return value;
+  if (value === null || value === undefined) return "-";
+  try {
+    return typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
+  } catch {
+    return "-";
+  }
+}
 
 const RiskAnalysis = () => {
   const { toast } = useToast();
@@ -20,13 +30,13 @@ const RiskAnalysis = () => {
     material_type: "Steel Tower",
     expected_delivery_days: "45",
     project_deadline_days: "30",
-    external_factors: ["tax hike", "bad weather"]
+    external_factors: ["tax hike", "bad weather"],
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const payload = {
         project_name: formData.project_name,
@@ -36,10 +46,10 @@ const RiskAnalysis = () => {
         material_type: formData.material_type,
         expected_delivery_days: parseInt(formData.expected_delivery_days),
         project_deadline_days: parseInt(formData.project_deadline_days),
-        external_factors: formData.external_factors
+        external_factors: formData.external_factors,
       };
-      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
-        body: { service: 'risk_analysis', payload }
+      const { data: fnData, error: fnError } = await supabase.functions.invoke("proxy", {
+        body: { service: "risk_analysis", payload },
       });
       if (fnError) throw fnError;
       setResult(fnData);
@@ -150,10 +160,14 @@ const RiskAnalysis = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-destructive">
-                  {result.risk_score}
+                  {renderSafe(result.risk_score)}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  {result.risk_score > 70 ? "High Risk" : result.risk_score > 40 ? "Medium Risk" : "Low Risk"}
+                  {result.risk_score > 70
+                    ? "High Risk"
+                    : result.risk_score > 40
+                    ? "Medium Risk"
+                    : "Low Risk"}
                 </p>
               </CardContent>
             </Card>
@@ -167,8 +181,16 @@ const RiskAnalysis = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm">
-                  <p><span className="font-semibold">Project:</span> {result.project}</p>
-                  <p><span className="font-semibold">Location:</span> {result.location}</p>
+                  <p>
+                    <span className="font-semibold">Project:</span> {renderSafe(result.project)}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Location:</span> {renderSafe(result.location)}
+                  </p>
+                  <p>
+                    <span className="font-semibold">External Factors:</span>{" "}
+                    <pre className="whitespace-pre-wrap">{renderSafe(result.external_factors)}</pre>
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -183,7 +205,7 @@ const RiskAnalysis = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm whitespace-pre-wrap">{result.real_time_context}</p>
+                <pre className="whitespace-pre-wrap">{renderSafe(result.real_time_context)}</pre>
               </CardContent>
             </Card>
           )}
@@ -197,9 +219,7 @@ const RiskAnalysis = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-sm max-w-none">
-                  <p className="whitespace-pre-wrap text-foreground">{result.ai_mitigation_recommendations}</p>
-                </div>
+                <pre className="whitespace-pre-wrap">{renderSafe(result.ai_mitigation_recommendations)}</pre>
               </CardContent>
             </Card>
           )}

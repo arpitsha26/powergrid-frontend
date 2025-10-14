@@ -121,15 +121,27 @@ const AnomalyDetection = () => {
                       <div className="grid grid-cols-3 gap-4 mb-2">
                         <div>
                           <p className="text-sm text-muted-foreground">Date</p>
-                          <p className="font-semibold">{anomaly.date}</p>
+                          <p className="font-semibold">
+                            {typeof anomaly.date === "string" || typeof anomaly.date === "number"
+                              ? anomaly.date
+                              : JSON.stringify(anomaly.date)}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Quantity</p>
-                          <p className="font-semibold">{anomaly.quantity}</p>
+                          <p className="font-semibold">
+                            {typeof anomaly.quantity === "string" || typeof anomaly.quantity === "number"
+                              ? anomaly.quantity
+                              : JSON.stringify(anomaly.quantity)}
+                          </p>
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Confidence</p>
-                          <p className="font-semibold">{anomaly.confidence}%</p>
+                          <p className="font-semibold">
+                            {typeof anomaly.confidence === "string" || typeof anomaly.confidence === "number"
+                              ? anomaly.confidence + "%"
+                              : JSON.stringify(anomaly.confidence)}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -151,7 +163,11 @@ const AnomalyDetection = () => {
               </CardHeader>
               <CardContent>
                 <div className="prose prose-sm max-w-none">
-                  <p className="whitespace-pre-wrap text-foreground">{result.ai_insight}</p>
+                  <p className="whitespace-pre-wrap text-foreground">
+                    {typeof result.ai_insight === "string"
+                      ? result.ai_insight
+                      : JSON.stringify(result.ai_insight, null, 2)}
+                  </p>
                 </div>
               </CardContent>
             </Card>

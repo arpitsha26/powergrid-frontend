@@ -1,10 +1,12 @@
+// 
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "*",
-};
+// List allowed origins (frontend URLs)
+const ALLOWED_ORIGINS = [
+  "http://localhost:8080",          // Development
+  "https://your-production-site.com" // Replace with your live frontend URL
+];
 
 const SERVICES: Record<string, string> = {
   demand_forecast: "https://material-forecast.onrender.com/forecast",
@@ -17,11 +19,29 @@ const SERVICES: Record<string, string> = {
   risk_analysis: "https://risk-analysis-rq2k.onrender.com/analyze-risk",
 };
 
+// Function to generate proper CORS headers per request
+function getCorsHeaders(origin?: string) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization, X-Client-Info, APIKey, Content-Type",
+    "Access-Control-Allow-Credentials": "true",
+  };
+}
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const origin = req.headers.get("origin") || undefined;
+  const corsHeaders = getCorsHeaders(origin);
+
+  // Handle preflight OPTIONS request
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
 
   try {
     const { service, payload } = await req.json();
+
     const url = SERVICES[service as keyof typeof SERVICES];
     if (!url) {
       return new Response(JSON.stringify({ error: "Unknown service" }), {
@@ -37,9 +57,7 @@ serve(async (req) => {
     });
 
     const text = await upstream.text();
-
-    // Try to pass through JSON, otherwise wrap text
-    let body: any;
+    let body;
     try {
       body = JSON.parse(text);
     } catch {

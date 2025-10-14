@@ -22,6 +22,11 @@ const MultifactorForecast = () => {
     materials: ["Steel", "Cement", "Copper", "Insulators"],
   });
 
+  const renderSafe = (value: any) =>
+    typeof value === "string" || typeof value === "number"
+      ? value
+      : JSON.stringify(value, null, 2);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -143,7 +148,7 @@ const MultifactorForecast = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Forecast Summary</CardTitle>
-                <CardDescription>{result.forecast?.forecast_summary}</CardDescription>
+                <CardDescription>{renderSafe(result.forecast?.forecast_summary)}</CardDescription>
               </CardHeader>
             </Card>
 
@@ -155,13 +160,13 @@ const MultifactorForecast = () => {
                 {result.forecast?.materials_forecast?.map((material: any, index: number) => (
                   <div key={index} className="p-4 bg-muted rounded-lg space-y-2">
                     <div className="flex justify-between items-start">
-                      <h3 className="font-semibold text-lg">{material.material}</h3>
-                      {getConfidenceBadge(material.confidence)}
+                      <h3 className="font-semibold text-lg">{renderSafe(material.material)}</h3>
+                      {getConfidenceBadge(String(renderSafe(material.confidence)))}
                     </div>
                     <p className="text-2xl font-bold text-primary">
-                      {material.estimated_quantity_tons} tons
+                      {renderSafe(material.estimated_quantity_tons)} tons
                     </p>
-                    <p className="text-sm text-muted-foreground">{material.reasoning}</p>
+                    <p className="text-sm text-muted-foreground">{renderSafe(material.reasoning)}</p>
                   </div>
                 ))}
               </CardContent>
@@ -174,8 +179,8 @@ const MultifactorForecast = () => {
                 </CardHeader>
                 <CardContent>
                   <ul className="list-disc list-inside space-y-2">
-                    {result.forecast.optimization_notes.map((note: string, index: number) => (
-                      <li key={index} className="text-sm text-muted-foreground">{note}</li>
+                    {result.forecast.optimization_notes.map((note: any, index: number) => (
+                      <li key={index} className="text-sm text-muted-foreground">{renderSafe(note)}</li>
                     ))}
                   </ul>
                 </CardContent>

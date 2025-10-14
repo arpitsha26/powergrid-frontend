@@ -16,8 +16,13 @@ const ProcurementRecommendation = () => {
     material_name: "Steel Tower Bolts",
     quantity: 5000,
     location: "Maharashtra",
-    budget: 2500000,
+    budget: 2500000,  
   });
+
+  const renderSafe = (value: any) =>
+    typeof value === "string" || typeof value === "number"
+      ? value
+      : JSON.stringify(value, null, 2);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,13 +128,13 @@ const ProcurementRecommendation = () => {
               <CardHeader>
                 <CardTitle>AI Recommendation</CardTitle>
                 <CardDescription>
-                  {result.material} in {result.location}
+                  {renderSafe(result.material)} in {renderSafe(result.location)}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="prose prose-sm max-w-none">
                   <div className="whitespace-pre-wrap text-sm text-muted-foreground">
-                    {result.recommendation}
+                    {renderSafe(result.recommendation)}
                   </div>
                 </div>
               </CardContent>
@@ -145,7 +150,7 @@ const ProcurementRecommendation = () => {
                   {result.top_suppliers.map((supplier: any, index: number) => (
                     <div key={index} className="p-4 bg-muted rounded-lg">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold">{supplier.title}</h3>
+                        <h3 className="font-semibold">{renderSafe(supplier.title)}</h3>
                         <a
                           href={supplier.link}
                           target="_blank"
@@ -155,7 +160,7 @@ const ProcurementRecommendation = () => {
                           <ExternalLink className="w-4 h-4" />
                         </a>
                       </div>
-                      <p className="text-sm text-muted-foreground">{supplier.snippet}</p>
+                      <p className="text-sm text-muted-foreground">{renderSafe(supplier.snippet)}</p>
                     </div>
                   ))}
                 </CardContent>

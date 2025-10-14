@@ -8,6 +8,17 @@ import { BarChart3, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+// --- Render safe helper ---
+function renderSafe(value: any): React.ReactNode {
+  if (typeof value === "string" || typeof value === "number") return value;
+  if (value === null || value === undefined) return "-";
+  try {
+    return typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
+  } catch {
+    return "-";
+  }
+}
+
 const ScenarioPlanning = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -28,12 +39,12 @@ const ScenarioPlanning = () => {
     setLoading(true);
 
     try {
-      const { data: fnData, error: fnError } = await supabase.functions.invoke('proxy', {
-        body: { service: 'scenario_planning', payload: formData }
+      const { data: fnData, error: fnError } = await supabase.functions.invoke("proxy", {
+        body: { service: "scenario_planning", payload: formData },
       });
       if (fnError) throw fnError;
       setResult(fnData);
-      
+
       toast({
         title: "Scenario Analysis Complete",
         description: "What-if analysis has been generated.",
@@ -156,17 +167,21 @@ const ScenarioPlanning = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Scenario Summary</CardTitle>
-                <CardDescription>{result.scenario_summary}</CardDescription>
+                <CardDescription>{renderSafe(result.scenario_summary)}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">Adjusted Budget</p>
-                    <p className="text-xl font-bold">₹{result.project_details?.budget?.toLocaleString()}</p>
+                    <p className="text-xl font-bold">
+                      ₹{renderSafe(result.project_details?.budget?.toLocaleString())}
+                    </p>
                   </div>
                   <div className="p-3 bg-muted rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">Risk Level</p>
-                    <p className="text-xl font-bold capitalize">{result.risk_assessment?.risk_level}</p>
+                    <p className="text-xl font-bold capitalize">
+                      {renderSafe(result.risk_assessment?.risk_level)}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -181,23 +196,28 @@ const ScenarioPlanning = () => {
                   {Object.entries(result.market_snapshot).map(([material, data]: [string, any]) => (
                     <div key={material} className="p-3 bg-muted rounded-lg">
                       <div className="flex justify-between items-center mb-2">
-                        <h3 className="font-semibold capitalize">{material}</h3>
-                        <span className={`text-sm font-medium ${data.price_change >= 0 ? 'text-success' : 'text-destructive'}`}>
-                          {data.price_change > 0 ? '+' : ''}{data.price_change}%
+                        <h3 className="font-semibold capitalize">{renderSafe(material)}</h3>
+                        <span
+                          className={`text-sm font-medium ${
+                            data?.price_change >= 0 ? "text-success" : "text-destructive"
+                          }`}
+                        >
+                          {data?.price_change > 0 ? "+" : ""}
+                          {renderSafe(data?.price_change)}%
                         </span>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div>
                           <p className="text-muted-foreground">Price</p>
-                          <p className="font-medium">₹{data.price}</p>
+                          <p className="font-medium">₹{renderSafe(data?.price)}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Demand</p>
-                          <p className="font-medium capitalize">{data.demand}</p>
+                          <p className="font-medium capitalize">{renderSafe(data?.demand)}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Procurement</p>
-                          <p className="font-medium capitalize">{data.procurement_needs}</p>
+                          <p className="font-medium capitalize">{renderSafe(data?.procurement_needs)}</p>
                         </div>
                       </div>
                     </div>
@@ -214,19 +234,21 @@ const ScenarioPlanning = () => {
                 <CardContent className="space-y-3">
                   {Object.entries(result.material_breakdown).map(([material, data]: [string, any]) => (
                     <div key={material} className="p-3 bg-muted rounded-lg">
-                      <h3 className="font-semibold capitalize mb-2">{material}</h3>
+                      <h3 className="font-semibold capitalize mb-2">{renderSafe(material)}</h3>
                       <div className="grid grid-cols-3 gap-2 text-sm">
                         <div>
                           <p className="text-muted-foreground text-xs">Quantity</p>
-                          <p className="font-medium">{data.quantity}</p>
+                          <p className="font-medium">{renderSafe(data?.quantity)}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground text-xs">Unit Price</p>
-                          <p className="font-medium">₹{data.price}</p>
+                          <p className="font-medium">₹{renderSafe(data?.price)}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground text-xs">Total Cost</p>
-                          <p className="font-medium">₹{(data.total_cost / 1000000).toFixed(2)}M</p>
+                          <p className="font-medium">
+                            ₹{renderSafe((data?.total_cost ? (data.total_cost / 1000000).toFixed(2) : null))}M
+                          </p>
                         </div>
                       </div>
                     </div>
