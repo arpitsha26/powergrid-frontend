@@ -92,7 +92,7 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">POWERGRID Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">GRIDAURA Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">Material Demand Forecasting & Project Analytics</p>
         </div>
         <div className="text-right">

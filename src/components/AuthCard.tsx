@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+
 const AuthCard = ({ title, children }) => {
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-blue-900 via-gray-900 to-black">
@@ -26,25 +27,15 @@ const AuthCard = ({ title, children }) => {
       >
         {/* Tower Logo */}
         <div className="flex flex-col items-center gap-2 mb-6">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 64 64"
-            className="w-14 h-14 text-yellow-400"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M32 2 L42 12 L22 12 Z" />
-            <path d="M32 12 L32 50" />
-            <path d="M20 22 H44" />
-            <path d="M16 32 H48" />
-            <path d="M12 42 H52" />
-            <path d="M8 52 H56" />
-            <path d="M24 50 L16 62" />
-            <path d="M40 50 L48 62" />
-          </svg>
+          <div className="flex flex-col items-center gap-2 mb-6">
+  <img
+    src="/grid2.jpg"
+    alt="POWERGRID Logo"
+    className="w-14 h-14 object-cover rounded-full"
+  />
+</div>
 
-          <h1 className="text-xl font-bold text-center">POWERGRID</h1>
+          <h1 className="text-xl font-bold text-center">GRIDAURA</h1>
           <p className="text-sm text-gray-300 -mt-1">
             AI Supply Chain Planning
           </p>

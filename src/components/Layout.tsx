@@ -49,7 +49,7 @@ const Layout = () => {
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground tracking-tight">POWERGRID</h1>
+              <h1 className="text-xl font-bold text-foreground tracking-tight">GRIDAURA</h1>
               <p className="text-xs text-muted-foreground">AI Supply Chain Planning</p>
             </div>
           </div>
