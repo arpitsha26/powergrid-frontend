@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
@@ -27,34 +28,31 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Auth routes without layout */}
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
+  {/* Auth routes without layout */}
+  <Route path="/signup" element={<Signup />} />
+  <Route path="/login" element={<Login />} />
 
-          {/* Main app routes inside layout */}
-          <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/demand-forecast" element={<DemandForecast />} />
-            <Route
-              path="/multifactor-forecast"
-              element={<MultifactorForecast />}
-            />
-            <Route
-              path="/inventory-optimization"
-              element={<InventoryOptimization />}
-            />
-            <Route
-              path="/procurement"
-              element={<ProcurementRecommendation />}
-            />
-            <Route path="/scenario-planning" element={<ScenarioPlanning />} />
-            <Route path="/cost-optimization" element={<CostOptimization />} />
-            <Route path="/anomaly-detection" element={<AnomalyDetection />} />
-            <Route path="/risk-analysis" element={<RiskAnalysis />} />
-          </Route>
+  {/* Main app routes inside layout */}
+  <Route
+    element={
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    }
+  >
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/demand-forecast" element={<DemandForecast />} />
+    <Route path="/multifactor-forecast" element={<MultifactorForecast />} />
+    <Route path="/inventory-optimization" element={<InventoryOptimization />} />
+    <Route path="/procurement" element={<ProcurementRecommendation />} />
+    <Route path="/scenario-planning" element={<ScenarioPlanning />} />
+    <Route path="/cost-optimization" element={<CostOptimization />} />
+    <Route path="/anomaly-detection" element={<AnomalyDetection />} />
+    <Route path="/risk-analysis" element={<RiskAnalysis />} />
+  </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+  <Route path="*" element={<NotFound />} />
+</Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

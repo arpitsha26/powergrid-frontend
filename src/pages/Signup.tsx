@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthCard from "../components/AuthCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const Signup = () => {
+  const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -18,18 +20,24 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://grid-aura.onrender.com/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fullName, email, phone, password }),
-      });
+      const res = await fetch(
+        "https://grid-aura.onrender.com/api/auth/signup",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fullName, email, phone, password }),
+        }
+      );
 
       const data = await res.json();
 
       if (res.ok) {
+        // Save token & user info
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        window.location.href = "/";
+
+        // Redirect to dashboard using React Router
+        navigate("/", { replace: true });
       } else {
         alert(data.message || "Signup failed");
       }
@@ -42,7 +50,6 @@ const Signup = () => {
   };
 
   const handleGoogleSignup = () => {
-    // Redirect user to backend Google OAuth endpoint
     window.location.href = "https://grid-aura.onrender.com/api/gr/google";
   };
 
@@ -74,7 +81,6 @@ const Signup = () => {
           className="text-black"
         />
 
-        {/* Password input with show/hide */}
         <div className="relative">
           <Input
             type={showPassword ? "text" : "password"}
@@ -89,7 +95,11 @@ const Signup = () => {
             className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? <AiOutlineEyeInvisible size={20} /> : <AiOutlineEye size={20} />}
+            {showPassword ? (
+              <AiOutlineEyeInvisible size={20} />
+            ) : (
+              <AiOutlineEye size={20} />
+            )}
           </button>
         </div>
 
@@ -125,7 +135,6 @@ const Signup = () => {
         </Button>
       </form>
 
-      {/* Google button */}
       <Button
         onClick={handleGoogleSignup}
         className="mt-4 w-12 h-12 p-2 rounded-full flex items-center justify-center bg-white border border-gray-300 hover:shadow-md mx-auto"

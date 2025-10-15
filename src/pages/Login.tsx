@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthCard from "../components/AuthCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +7,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,18 +18,24 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://grid-aura.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        "https://grid-aura.onrender.com/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await res.json();
 
       if (res.ok) {
+        // Save token & user info
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        window.location.href = "/";
+
+        // Redirect to dashboard
+        navigate("/", { replace: true });
       } else {
         alert(data.message || "Login failed");
       }
@@ -40,7 +48,6 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    
     window.location.href = "https://grid-aura.onrender.com/api/gr/google";
   };
 
@@ -106,7 +113,6 @@ const Login = () => {
         </Button>
       </form>
 
-      {/* Google login button */}
       <Button
         onClick={handleGoogleLogin}
         className="mt-4 w-12 h-12 p-2 rounded-full flex items-center justify-center bg-white border border-gray-300 hover:shadow-md mx-auto"
