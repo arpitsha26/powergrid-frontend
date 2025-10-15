@@ -1,20 +1,15 @@
-import { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, Outlet } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Package, 
-  ShoppingCart, 
-  DollarSign, 
-  AlertTriangle, 
-  Target, 
-  GitBranch 
+import {
+  BarChart3,
+  TrendingUp,
+  Package,
+  ShoppingCart,
+  DollarSign,
+  AlertTriangle,
+  Target,
+  GitBranch,
 } from "lucide-react";
-
-interface LayoutProps {
-  children: ReactNode;
-}
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: BarChart3 },
@@ -27,21 +22,22 @@ const navItems = [
   { path: "/risk-analysis", label: "Risk Analysis", icon: Target },
 ];
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="border-b border-border bg-card shadow-soft sticky top-0 z-50">
+      <header className="border-b border-border bg-card shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-primary-foreground" />
+              {/* Replace this with a tower icon or SVG */}
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-lg flex items-center justify-center shadow-md">
+                <BarChart3 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">POWERGRID</h1>
+                <h1 className="text-xl font-bold text-foreground tracking-tight">POWERGRID</h1>
                 <p className="text-xs text-muted-foreground">AI Supply Chain Planning</p>
               </div>
             </div>
@@ -49,22 +45,23 @@ const Layout = ({ children }: LayoutProps) => {
         </div>
       </header>
 
-      <div className="flex">
+      {/* Layout Body */}
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 border-r border-border bg-card min-h-[calc(100vh-73px)] sticky top-[73px]">
+        <aside className="w-64 border-r border-border bg-card h-[calc(100vh-73px)] sticky top-[73px] overflow-y-auto">
           <nav className="p-4 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
-              
+
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex items-center space-x-3 px-4 py-3 rounded-lg transition-smooth",
+                    "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-soft"
+                      ? "bg-primary text-primary-foreground shadow"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
@@ -77,8 +74,9 @@ const Layout = ({ children }: LayoutProps) => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
-          {children}
+        <main className="flex-1 overflow-y-auto p-8 bg-background">
+          {/* 🔥 This is where nested route pages render */}
+          <Outlet />
         </main>
       </div>
     </div>
